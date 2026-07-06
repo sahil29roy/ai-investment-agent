@@ -1,0 +1,7 @@
+{
+  "name": "ai-investment-agent",
+  "private": true,
+  "workspaces": [
+    "client"
+  ]
+}
