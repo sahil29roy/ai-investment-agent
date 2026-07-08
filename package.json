@@ -2,6 +2,7 @@
   "name": "ai-investment-agent",
   "private": true,
   "workspaces": [
-    "client"
+    "client",
+    "server"
   ]
 }
