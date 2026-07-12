@@ -13,18 +13,15 @@ export function SearchBar({ value, onChange, placeholder = "Search for a company
     <Box position="relative" width="100%">
       <Flex
         align="center"
-        bg="surface"
-        border="1px solid"
+        bg="transparent"
+        borderBottom="2px solid"
         borderColor="border"
-        borderRadius="xl"
-        px="4"
-        height="48px"
-        boxShadow="sm"
+        px="2"
+        height="40px"
         transition="all 0.2s ease"
-        _focusWithin={{ borderColor: "brand", boxShadow: "md" }}
       >
-        <Box color="brand" mr="3" display="flex" alignItems="center">
-          <Search size={18} />
+        <Box color="text.primary" mr="3" display="flex" alignItems="center">
+          <Search size={16} />
         </Box>
         <Input
           value={value}
@@ -40,7 +37,7 @@ export function SearchBar({ value, onChange, placeholder = "Search for a company
           height="100%"
           width="100%"
           color="text.primary"
-          fontSize="15px"
+          fontSize="14px"
           fontFamily="body"
           px="0"
           _placeholder={{ color: "text.muted", opacity: 0.6, fontSize: "14px", fontFamily: "body" }}

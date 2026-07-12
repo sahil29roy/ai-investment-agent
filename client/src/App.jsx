@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { Box, Container, Flex, Text, SimpleGrid, Theme } from '@chakra-ui/react'
+import { Box, Container, Flex, Text, SimpleGrid, Theme, Separator } from '@chakra-ui/react'
 import { Provider } from './components/ui/provider'
 import { SearchBar } from './components/SearchBar'
 import { CompanyProfile } from './components/CompanyProfile'
 import { RecommendationCard } from './components/RecommendationCard'
+import { FinancialSummary } from './components/FinancialSummary'
 import { NewsSection } from './components/NewsSection'
-import { Compass } from 'lucide-react'
 
 const TICKER_DATA = {
   AAPL: {
@@ -18,6 +18,16 @@ const TICKER_DATA = {
     analystsCount: 42,
     targetPrice: "$210.00",
     upside: "+15.0%",
+    metrics: [
+      { label: "Share Price", value: "$178.20", change: "+1.2%" },
+      { label: "Market Cap", value: "$2.89T" },
+      { label: "P/E Ratio", value: "28.4" },
+      { label: "Dividend Yield", value: "0.52%" },
+      { label: "Volume (Avg)", value: "52.4M" },
+      { label: "52W High", value: "$198.11" },
+      { label: "52W Low", value: "$164.08" },
+      { label: "Beta (Volatility)", value: "1.24" }
+    ],
     company: {
       ticker: "AAPL",
       name: "Apple Inc.",
@@ -62,6 +72,16 @@ const TICKER_DATA = {
     analystsCount: 56,
     targetPrice: "$140.00",
     upside: "+28.4%",
+    metrics: [
+      { label: "Share Price", value: "$128.20", change: "+4.82%" },
+      { label: "Market Cap", value: "$3.15T" },
+      { label: "P/E Ratio", value: "68.20" },
+      { label: "Dividend Yield", value: "0.03%" },
+      { label: "Volume (Avg)", value: "248.1M" },
+      { label: "52W High", value: "$140.76" },
+      { label: "52W Low", value: "$45.01" },
+      { label: "Beta (Volatility)", value: "1.85", change: "+0.08" }
+    ],
     company: {
       ticker: "NVDA",
       name: "NVIDIA Corp.",
@@ -99,6 +119,16 @@ const TICKER_DATA = {
     analystsCount: 38,
     targetPrice: "$165.00",
     upside: "-12.5%",
+    metrics: [
+      { label: "Share Price", value: "$175.40", change: "-2.1%" },
+      { label: "Market Cap", value: "$552.1B" },
+      { label: "P/E Ratio", value: "45.8" },
+      { label: "Dividend Yield", value: "0.00%" },
+      { label: "Volume (Avg)", value: "88.2M" },
+      { label: "52W High", value: "$271.00" },
+      { label: "52W Low", value: "$138.80" },
+      { label: "Beta (Volatility)", value: "2.10" }
+    ],
     company: {
       ticker: "TSLA",
       name: "Tesla Inc.",
@@ -136,6 +166,16 @@ const TICKER_DATA = {
     analystsCount: 48,
     targetPrice: "$465.00",
     upside: "+10.2%",
+    metrics: [
+      { label: "Share Price", value: "$415.60", change: "+0.85%" },
+      { label: "Market Cap", value: "$3.09T" },
+      { label: "P/E Ratio", value: "35.2" },
+      { label: "Dividend Yield", value: "0.72%" },
+      { label: "Volume (Avg)", value: "22.8M" },
+      { label: "52W High", value: "$430.00" },
+      { label: "52W Low", value: "$315.00" },
+      { label: "Beta (Volatility)", value: "0.89" }
+    ],
     company: {
       ticker: "MSFT",
       name: "Microsoft Corp.",
@@ -176,7 +216,7 @@ function MainDashboard() {
     if (TICKER_DATA[cleanVal]) {
       setActiveTicker(cleanVal)
     } else {
-      alert(`We couldn't find "${cleanVal}" in our current list. Try searching for AAPL, NVDA, TSLA, or MSFT.`)
+      alert(`No records found for "${cleanVal}". Supported: AAPL, NVDA, TSLA, MSFT.`)
     }
   }
 
@@ -186,66 +226,58 @@ function MainDashboard() {
   }
 
   return (
-    <Box minHeight="100vh" bg="bg" color="text.primary" py="8" px="4">
-      <Container maxW="1200px" px="0">
+    <Box minHeight="100vh" bg="bg" color="text.primary" py="10" px="6">
+      <Container maxW="1100px" px="0">
         
-        {/* Friendly Top Header */}
-        <Flex justify="space-between" align="center" borderBottom="1px solid" borderColor="border" pb="4" mb="8">
-          <Flex align="center" gap="3">
-            <Box color="brand" display="flex" alignItems="center">
-              <Compass size={28} />
-            </Box>
-            <Box>
-              <Text fontSize="18px" fontWeight="bold" color="brand" lineHeight="1.2">
-                WealthInsight Portal
-              </Text>
-              <Text fontSize="12px" color="text.muted">
-                Your reassuring, automated investment copilot
-              </Text>
-            </Box>
-          </Flex>
-          <Flex align="center" gap="4">
-            <Box display={{ base: "none", sm: "block" }} textAlign="right">
-              <Text fontSize="12px" fontWeight="semibold" color="text.primary">
-                System Status: Ready
-              </Text>
-              <Text fontSize="11px" color="text.muted">
-                Updated just now
-              </Text>
-            </Box>
-          </Flex>
+        {/* Editorial Header */}
+        <Flex justify="space-between" align="baseline" pb="2" mb="4">
+          <Box>
+            <Text fontSize="30px" fontWeight="bold" fontFamily="heading" color="text.primary" letterSpacing="-0.02em">
+              The Investment Research Dispatch
+            </Text>
+            <Text fontSize="12px" color="text.muted" fontFamily="body" mt="0.5" fontStyle="italic">
+              Weekly Analyst Review & Asset Evaluation Services • Vol. XII No. 24
+            </Text>
+          </Box>
+          <Box textAlign="right" display={{ base: "none", md: "block" }}>
+            <Text fontSize="12px" fontWeight="bold" fontFamily="body" color="text.primary" letterSpacing="0.05em">
+              LONDON // NEW YORK // TOKYO
+            </Text>
+            <Text fontSize="11px" color="text.muted" fontFamily="body">
+              Published July 2026
+            </Text>
+          </Box>
         </Flex>
 
-        {/* Search & Quick Tickers with plenty of space (gap 8) */}
+        <Separator borderColor="border" borderWidth="1px" mb="6" />
+
+        {/* Search & Quick Tickers */}
         <Flex direction="column" gap="4" mb="8">
           <SearchBar 
             value={searchVal} 
             onChange={setSearchVal} 
             onSubmit={handleSearchSubmit} 
           />
-          <Flex gap="2" wrap="wrap" align="center">
-            <Text fontSize="13px" fontWeight="semibold" color="text.muted" mr="2">
-              Popular Stocks:
+          <Flex gap="3" wrap="wrap" align="center">
+            <Text fontSize="12px" fontWeight="bold" color="text.muted" fontFamily="body" textTransform="uppercase" letterSpacing="0.05em">
+              Select Dispatch:
             </Text>
             {Object.keys(TICKER_DATA).map((ticker) => (
               <Box
                 key={ticker}
                 as="button"
                 onClick={() => handleQuickSelect(ticker)}
-                border="1px solid"
-                borderColor={activeTicker === ticker ? "brand" : "border"}
-                color={activeTicker === ticker ? "white" : "text.primary"}
-                bg={activeTicker === ticker ? "brand" : "surface"}
+                borderBottom="1px solid"
+                borderColor={activeTicker === ticker ? "border" : "transparent"}
+                color="text.primary"
                 fontFamily="body"
                 fontSize="13px"
-                fontWeight="semibold"
-                px="4"
-                py="2"
-                borderRadius="lg"
+                fontWeight={activeTicker === ticker ? "bold" : "medium"}
+                px="1"
+                py="0.5"
                 cursor="pointer"
                 transition="all 0.15s ease"
-                boxShadow={activeTicker === ticker ? "sm" : "none"}
-                _hover={{ borderColor: "brand", bg: activeTicker === ticker ? "brand" : "rgba(15, 110, 86, 0.05)" }}
+                _hover={{ borderColor: "border" }}
               >
                 {ticker} - {TICKER_DATA[ticker].name}
               </Box>
@@ -253,29 +285,37 @@ function MainDashboard() {
           </Flex>
         </Flex>
 
-        {/* Main Work Grid using plenty of spacing (gap="8") */}
-        <SimpleGrid columns={{ base: 1, lg: 3 }} gap="8">
-          {/* Left Column (span 2): Company Profile & News Section */}
+        <Separator borderColor="border" borderWidth="1px" mb="8" />
+
+        {/* Two-Column Editorial Layout */}
+        <SimpleGrid columns={{ base: 1, lg: 3 }} gap="10">
+          {/* Left/Middle Column (span 2): Company Profile & News Dispatches */}
           <Flex gridColumn={{ lg: "span 2" }} direction="column" gap="8">
             <CompanyProfile company={currentData.company} />
+            <Separator borderColor="border" borderWidth="1px" />
             <NewsSection news={currentData.news} />
           </Flex>
 
-          {/* Right Column: Recommendation Card */}
-          <Box display="flex" flexDirection="column" gap="8">
-            <RecommendationCard recommendation={currentData} />
-            
-            {/* Friendly reassurance note card */}
-            <Box bg="rgba(15, 110, 86, 0.04)" border="1px solid" borderColor="rgba(15, 110, 86, 0.15)" borderRadius="xl" p="5">
-              <Text fontSize="13px" fontWeight="bold" color="brand" textTransform="uppercase" letterSpacing="0.05em" mb="2">
-                Reassuring Guidance
+          {/* Right Column: Financial Parameters list & Verdict */}
+          <Flex direction="column" gap="8">
+            <Box>
+              <Text fontSize="16px" fontWeight="bold" fontFamily="body" color="text.primary" textTransform="uppercase" letterSpacing="0.08em" mb="3">
+                Financial Parameters
               </Text>
-              <Text fontSize="13px" lineHeight="1.5" color="text.primary">
-                WealthInsight recommendations are generated by analyzing historical financials, modern analyst targets, and current news sentiment. Always consider your personal risk tolerance before executing trades.
-              </Text>
+              <Separator borderColor="border" borderWidth="1px" mb="3" />
+              <FinancialSummary metrics={currentData.metrics} />
             </Box>
-          </Box>
+
+            <RecommendationCard recommendation={currentData} />
+          </Flex>
         </SimpleGrid>
+
+        {/* Footer Disclaimer */}
+        <Box mt="12" pt="6" borderTop="1px solid" borderColor="border">
+          <Text fontSize="11px" color="text.muted" fontFamily="body" lineHeight="1.5" textAlign="center" fontStyle="italic">
+            This research dispatch is designed for educational evaluation. Decisions are made solely on analyst interpretations and mock models. All content is subject to copyright.
+          </Text>
+        </Box>
 
       </Container>
     </Box>

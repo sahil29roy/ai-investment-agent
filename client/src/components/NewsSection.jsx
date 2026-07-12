@@ -1,6 +1,5 @@
 import React from 'react'
-import { Box, Flex, Text, Badge } from '@chakra-ui/react'
-import { Calendar, Newspaper } from 'lucide-react'
+import { Box, Flex, Text, Separator } from '@chakra-ui/react'
 
 export function NewsSection({ news }) {
   const defaultNews = [
@@ -30,84 +29,56 @@ export function NewsSection({ news }) {
   const items = news || defaultNews
 
   return (
-    <Box
-      bg="surface"
-      border="1px solid"
-      borderColor="border"
-      borderRadius="xl"
-      p="6"
-      boxShadow="sm"
-      width="100%"
-    >
-      <Flex align="center" gap="2" mb="5">
-        <Box color="brand" display="flex" alignItems="center">
-          <Newspaper size={20} />
-        </Box>
-        <Text fontSize="16px" fontWeight="bold" color="text.primary">
-          Latest Research Insights & News
+    <Box width="100%">
+      <Flex direction="column" gap="4">
+        {/* Title */}
+        <Text fontSize="16px" fontWeight="bold" fontFamily="body" color="text.primary" textTransform="uppercase" letterSpacing="0.08em">
+          Market Intelligence & Research Dispatches
         </Text>
-      </Flex>
 
-      <Flex direction="column" gap="5">
-        {items.map((item, index) => {
-          let badgeColor = "gray.700"
-          let badgeBg = "gray.100"
-          let badgeBorder = "gray.300"
-          
-          if (item.sentiment === "Positive") {
-            badgeColor = "brand"
-            badgeBg = "rgba(15, 110, 86, 0.08)"
-            badgeBorder = "brand"
-          } else if (item.sentiment === "Negative") {
-            badgeColor = "negative"
-            badgeBg = "rgba(229, 62, 98, 0.08)"
-            badgeBorder = "negative"
-          }
+        <Separator borderColor="border" borderWidth="1px" />
 
-          return (
-            <Box
-              key={index}
-              p="4"
-              border="1px solid"
-              borderColor="border"
-              borderRadius="lg"
-              transition="all 0.2s ease"
-              _hover={{ borderColor: "brand", boxShadow: "sm" }}
-            >
-              <Flex justify="space-between" align="flex-start" gap="4" mb="2">
-                <Text fontSize="15px" fontWeight="bold" color="text.primary" lineHeight="1.4">
-                  {item.title}
+        <Flex direction="column" gap="6">
+          {items.map((item, index) => {
+            let sentimentColor = "text.muted"
+            if (item.sentiment === "Positive") sentimentColor = "positive"
+            if (item.sentiment === "Negative") sentimentColor = "negative"
+
+            return (
+              <Box key={index}>
+                <Flex justify="space-between" align="flex-start" gap="4" mb="1">
+                  <Text fontSize="16px" fontWeight="bold" fontFamily="heading" color="text.primary" lineHeight="1.3">
+                    {item.title}
+                  </Text>
+                  <Text
+                    color={sentimentColor}
+                    fontSize="11px"
+                    fontWeight="bold"
+                    fontFamily="body"
+                    textTransform="uppercase"
+                    letterSpacing="0.05em"
+                    whiteSpace="nowrap"
+                  >
+                    [{item.sentiment}]
+                  </Text>
+                </Flex>
+
+                <Text fontSize="13px" color="text.primary" mb="2" lineHeight="1.6" fontFamily="body">
+                  {item.summary}
                 </Text>
-                <Badge
-                  color={badgeColor}
-                  bg={badgeBg}
-                  border="1px solid"
-                  borderColor={badgeBorder}
-                  fontSize="11px"
-                  fontWeight="bold"
-                  borderRadius="md"
-                  px="2"
-                  py="0.5"
-                  textTransform="none"
-                >
-                  {item.sentiment}
-                </Badge>
-              </Flex>
 
-              <Text fontSize="13px" color="text.muted" mb="3" lineHeight="1.5">
-                {item.summary}
-              </Text>
-
-              <Flex justify="space-between" align="center" fontSize="12px" color="text.muted">
-                <Text fontWeight="medium">{item.source}</Text>
-                <Flex align="center" gap="1">
-                  <Calendar size={12} />
+                <Flex justify="space-between" align="center" fontSize="11px" color="text.muted" fontFamily="body">
+                  <Text fontWeight="semibold">{item.source}</Text>
                   <Text>{item.date}</Text>
                 </Flex>
-              </Flex>
-            </Box>
-          )
-        })}
+                
+                {index < items.length - 1 && (
+                  <Separator borderColor="border" borderWidth="1px" mt="4" borderStyle="dashed" />
+                )}
+              </Box>
+            )
+          })}
+        </Flex>
       </Flex>
     </Box>
   )

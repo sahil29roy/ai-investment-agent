@@ -1,6 +1,5 @@
 import React from 'react'
-import { Box, Flex, Text, Badge } from '@chakra-ui/react'
-import { Building2 } from 'lucide-react'
+import { Box, Flex, Text, Separator, SimpleGrid } from '@chakra-ui/react'
 
 export function CompanyProfile({ company }) {
   const defaultCompany = {
@@ -17,80 +16,59 @@ export function CompanyProfile({ company }) {
   const data = company || defaultCompany
 
   return (
-    <Box
-      bg="surface"
-      border="1px solid"
-      borderColor="border"
-      borderRadius="xl"
-      p="6"
-      boxShadow="sm"
-      width="100%"
-    >
-      <Flex align="center" gap="3" mb="4">
-        <Flex
-          bg="rgba(15, 110, 86, 0.08)"
-          color="brand"
-          w="44px"
-          h="44px"
-          borderRadius="lg"
-          align="center"
-          justify="center"
-        >
-          <Building2 size={22} />
-        </Flex>
+    <Box width="100%">
+      <Flex direction="column" gap="4">
+        {/* Editorial title */}
         <Box>
-          <Flex align="baseline" gap="2">
-            <Text fontSize="18px" fontWeight="bold" color="text.primary">
+          <Flex align="baseline" justify="space-between">
+            <Text fontSize="24px" fontWeight="bold" fontFamily="heading" color="text.primary">
               {data.name}
             </Text>
-            <Badge 
-              bg="rgba(15, 110, 86, 0.1)" 
-              color="brand" 
-              fontSize="12px" 
-              fontWeight="bold" 
-              px="2" 
-              py="0.5" 
-              borderRadius="md"
-              textTransform="none"
-            >
-              {data.ticker}
-            </Badge>
+            <Text fontSize="14px" fontWeight="bold" fontFamily="body" color="text.muted">
+              Ticker: {data.ticker}
+            </Text>
           </Flex>
-          <Text fontSize="13px" color="text.muted" fontWeight="medium">
+          <Text fontSize="12px" fontWeight="bold" color="text.muted" fontFamily="body" mt="1" textTransform="uppercase" letterSpacing="0.05em">
             {data.sector} • {data.industry}
           </Text>
         </Box>
-      </Flex>
 
-      <Text fontSize="15px" lineHeight="1.6" color="text.primary" mb="5" fontWeight="normal">
-        {data.description}
-      </Text>
+        <Separator borderColor="border" borderWidth="1px" />
 
-      <Flex wrap="wrap" gap="6" borderTop="1px solid" borderColor="border" pt="4">
-        <Box>
-          <Text fontSize="11px" fontWeight="bold" color="text.muted" textTransform="uppercase" letterSpacing="0.05em">
-            CEO
-          </Text>
-          <Text fontSize="14px" fontWeight="semibold" color="text.primary" mt="0.5">
-            {data.ceo}
-          </Text>
-        </Box>
-        <Box>
-          <Text fontSize="11px" fontWeight="bold" color="text.muted" textTransform="uppercase" letterSpacing="0.05em">
-            Employees
-          </Text>
-          <Text fontSize="14px" fontWeight="semibold" color="text.primary" mt="0.5">
-            {data.employees}
-          </Text>
-        </Box>
-        <Box>
-          <Text fontSize="11px" fontWeight="bold" color="text.muted" textTransform="uppercase" letterSpacing="0.05em">
-            Founded
-          </Text>
-          <Text fontSize="14px" fontWeight="semibold" color="text.primary" mt="0.5">
-            {data.founded}
-          </Text>
-        </Box>
+        {/* Serif description */}
+        <Text fontSize="15px" lineHeight="1.7" fontFamily="heading" color="text.primary">
+          {data.description}
+        </Text>
+
+        <Separator borderColor="border" borderWidth="1px" />
+
+        {/* Flat metadata */}
+        <SimpleGrid columns={3} gap="4">
+          <Box>
+            <Text fontSize="10px" fontWeight="bold" color="text.muted" fontFamily="body" textTransform="uppercase" letterSpacing="0.05em">
+              Executive Officer
+            </Text>
+            <Text fontSize="14px" fontWeight="semibold" color="text.primary" fontFamily="body" mt="0.5">
+              {data.ceo}
+            </Text>
+          </Box>
+          <Box>
+            <Text fontSize="10px" fontWeight="bold" color="text.muted" fontFamily="body" textTransform="uppercase" letterSpacing="0.05em">
+              Total Labor Force
+            </Text>
+            <Text fontSize="14px" fontWeight="semibold" color="text.primary" fontFamily="body" mt="0.5">
+              {data.employees}
+            </Text>
+          </Box>
+          <Box>
+            <Text fontSize="10px" fontWeight="bold" color="text.muted" fontFamily="body" textTransform="uppercase" letterSpacing="0.05em">
+              Year Founded
+            </Text>
+            <Text fontSize="14px" fontWeight="semibold" color="text.primary" fontFamily="body" mt="0.5">
+              {data.founded}
+            </Text>
+          </Box>
+        </SimpleGrid>
       </Flex>
     </Box>
   )
