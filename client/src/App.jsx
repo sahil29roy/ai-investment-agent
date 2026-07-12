@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Box, Container, Flex, Text, SimpleGrid, Theme, Separator } from '@chakra-ui/react'
+import { Box, Container, Flex, Text, SimpleGrid, Theme, Separator, Spinner } from '@chakra-ui/react'
 import { Provider } from './components/ui/provider'
 import { SearchBar } from './components/SearchBar'
 import { CompanyProfile } from './components/CompanyProfile'
@@ -205,24 +205,133 @@ const TICKER_DATA = {
   }
 }
 
+const mapBackendResponse = (resData) => {
+  const profile = resData.profile || {};
+  const symbol = resData.symbol || 'ASSET';
+  const companyName = resData.companyName || profile.companyName || symbol;
+  const analysis = resData.analysis || {};
+  const quote = resData.stock?.quote || {};
+
+  // Formats metrics
+  const mcap = profile.marketCap ? `$${(profile.marketCap / 1e12).toFixed(2)}T` : 'N/A';
+  const price = quote.price ? `$${quote.price.toFixed(2)}` : (profile.price ? `$${profile.price.toFixed(2)}` : 'N/A');
+  const pe = quote.pe ? quote.pe.toFixed(1) : (profile.pe ? profile.pe.toFixed(1) : 'N/A');
+  const divYield = profile.lastDividend ? `${(profile.lastDividend).toFixed(2)}%` : '0.00%';
+  const volAvg = profile.volAvg ? `${(profile.volAvg / 1e6).toFixed(1)}M` : 'N/A';
+  
+  const metrics = [
+    { label: "Share Price", value: price, change: quote.change ? `${quote.change >= 0 ? '+' : ''}${quote.change.toFixed(2)}` : '' },
+    { label: "Market Cap", value: mcap },
+    { label: "P/E Ratio", value: pe },
+    { label: "Dividend Yield", value: divYield },
+    { label: "Volume (Avg)", value: volAvg },
+    { label: "52W High/Low", value: profile.range || 'N/A' },
+    { label: "Beta (Volatility)", value: profile.beta ? profile.beta.toFixed(2) : '1.00' }
+  ];
+
+  // Formats news
+  const rawNews = resData.filteredNews?.filteredNews || resData.news || [];
+  const news = rawNews.slice(0, 3).map((n) => ({
+    title: n.title || 'Market Update',
+    source: n.site || n.source || 'Market Intelligence',
+    date: n.publishedDate ? new Date(n.publishedDate).toLocaleDateString() : 'Recent',
+    sentiment: n.sentiment || 'Neutral',
+    summary: n.summary || n.text || 'No summary available.'
+  }));
+
+  // Formats recommendation
+  const status = (analysis.recommendation || 'Hold').toUpperCase();
+  const consensus = status === 'INVEST' ? 'Strong Buy' : (status === 'HOLD' ? 'Hold' : 'Underperform');
+
+  return {
+    ticker: symbol,
+    name: companyName,
+    consensus,
+    score: analysis.confidence ? (analysis.confidence / 10).toFixed(1) : '7.0',
+    status,
+    summary: analysis.companySummary || 'No summary available.',
+    targetPrice: `${analysis.confidence || 70}%`,
+    upside: 'Confidence rating',
+    company: {
+      ticker: symbol,
+      name: companyName,
+      sector: profile.sector || 'N/A',
+      industry: profile.industry || 'N/A',
+      description: profile.description || 'No description available.',
+      founded: profile.ipoDate ? profile.ipoDate.substring(0, 4) : 'N/A',
+      ceo: profile.ceo || 'N/A',
+      employees: profile.fullTimeEmployees ? parseInt(profile.fullTimeEmployees).toLocaleString() : 'N/A'
+    },
+    news,
+    metrics
+  };
+};
+
 function MainDashboard() {
   const [searchVal, setSearchVal] = useState('')
   const [activeTicker, setActiveTicker] = useState('AAPL')
+  const [dynamicData, setDynamicData] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  const currentData = TICKER_DATA[activeTicker.toUpperCase()] || TICKER_DATA.AAPL
+  // Use dynamic data if available and matches the active ticker; otherwise use static TICKER_DATA
+  const isDynamicActive = dynamicData && dynamicData.ticker === activeTicker
+  const currentData = isDynamicActive 
+    ? dynamicData 
+    : (TICKER_DATA[activeTicker.toUpperCase()] || TICKER_DATA.AAPL)
 
-  const handleSearchSubmit = (value) => {
-    const cleanVal = value.trim().toUpperCase()
-    if (TICKER_DATA[cleanVal]) {
-      setActiveTicker(cleanVal)
-    } else {
-      alert(`No records found for "${cleanVal}". Supported: AAPL, NVDA, TSLA, MSFT.`)
+  const handleSearchSubmit = async (value) => {
+    const cleanVal = value.trim()
+    if (!cleanVal) return
+
+    // If it's a whitelisted key, we can load static instantly (or fetch it)
+    const upperVal = cleanVal.toUpperCase()
+    if (TICKER_DATA[upperVal]) {
+      setDynamicData(null)
+      setActiveTicker(upperVal)
+      setError(null)
+      return
+    }
+
+    // Run dynamic API search
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('http://localhost:5000/api/investment/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ company: cleanVal })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Request failed with status code ${response.status}`)
+      }
+
+      const resJson = await response.json()
+      if (!resJson.success) {
+        throw new Error(resJson.message || 'Investment analysis failed')
+      }
+
+      const mappedData = mapBackendResponse(resJson.data)
+      setDynamicData(mappedData)
+      setActiveTicker(mappedData.ticker)
+    } catch (err) {
+      console.error(err)
+      setError(err.message || 'Failed to retrieve research data.')
+    } finally {
+      setLoading(false)
     }
   }
 
   const handleQuickSelect = (ticker) => {
+    setDynamicData(null)
     setActiveTicker(ticker)
     setSearchVal(ticker)
+    setError(null)
   }
 
   return (
@@ -287,28 +396,65 @@ function MainDashboard() {
 
         <Separator borderColor="border" borderWidth="1px" mb="8" />
 
-        {/* Two-Column Editorial Layout */}
-        <SimpleGrid columns={{ base: 1, lg: 3 }} gap="10">
-          {/* Left/Middle Column (span 2): Company Profile & News Dispatches */}
-          <Flex gridColumn={{ lg: "span 2" }} direction="column" gap="8">
-            <CompanyProfile company={currentData.company} />
-            <Separator borderColor="border" borderWidth="1px" />
-            <NewsSection news={currentData.news} />
+        {/* Loader or Error or Dashboard View */}
+        {loading ? (
+          <Flex direction="column" align="center" justify="center" py="20" gap="4">
+            <Spinner size="lg" color="text.primary" borderWidth="2px" />
+            <Text fontFamily="heading" fontSize="18px" fontStyle="italic" color="text.primary">
+              Compiling research dispatch and executing asset analysis...
+            </Text>
+            <Text fontFamily="body" fontSize="12px" color="text.muted">
+              Resolving ticker parameters against Financial Modeling Prep stable API
+            </Text>
           </Flex>
-
-          {/* Right Column: Financial Parameters list & Verdict */}
-          <Flex direction="column" gap="8">
-            <Box>
-              <Text fontSize="16px" fontWeight="bold" fontFamily="body" color="text.primary" textTransform="uppercase" letterSpacing="0.08em" mb="3">
-                Financial Parameters
-              </Text>
-              <Separator borderColor="border" borderWidth="1px" mb="3" />
-              <FinancialSummary metrics={currentData.metrics} />
+        ) : error ? (
+          <Box border="1px solid" borderColor="negative" p="6" my="10">
+            <Text fontFamily="heading" fontSize="20px" fontWeight="bold" color="negative" mb="2">
+              Dispatch Compilation Failed
+            </Text>
+            <Text fontFamily="body" fontSize="14px" color="text.primary" mb="4">
+              {error}
+            </Text>
+            <Box
+              as="button"
+              onClick={() => handleSearchSubmit(searchVal)}
+              border="1px solid"
+              borderColor="border"
+              px="4"
+              py="2"
+              fontFamily="body"
+              fontSize="12px"
+              fontWeight="bold"
+              cursor="pointer"
+              _hover={{ bg: "border", color: "bg" }}
+            >
+              Retry Dispatch Compile
             </Box>
+          </Box>
+        ) : (
+          /* Two-Column Editorial Layout */
+          <SimpleGrid columns={{ base: 1, lg: 3 }} gap="10">
+            {/* Left/Middle Column (span 2): Company Profile & News Dispatches */}
+            <Flex gridColumn={{ lg: "span 2" }} direction="column" gap="8">
+              <CompanyProfile company={currentData.company} />
+              <Separator borderColor="border" borderWidth="1px" />
+              <NewsSection news={currentData.news} />
+            </Flex>
 
-            <RecommendationCard recommendation={currentData} />
-          </Flex>
-        </SimpleGrid>
+            {/* Right Column: Financial Parameters list & Verdict */}
+            <Flex direction="column" gap="8">
+              <Box>
+                <Text fontSize="16px" fontWeight="bold" fontFamily="body" color="text.primary" textTransform="uppercase" letterSpacing="0.08em" mb="3">
+                  Financial Parameters
+                </Text>
+                <Separator borderColor="border" borderWidth="1px" mb="3" />
+                <FinancialSummary metrics={currentData.metrics} />
+              </Box>
+
+              <RecommendationCard recommendation={currentData} />
+            </Flex>
+          </SimpleGrid>
+        )}
 
         {/* Footer Disclaimer */}
         <Box mt="12" pt="6" borderTop="1px solid" borderColor="border">

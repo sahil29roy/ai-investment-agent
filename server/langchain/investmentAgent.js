@@ -4,7 +4,7 @@
  */
 
 import { StateGraph, Annotation } from '@langchain/langgraph';
-import { searchCompanies } from '../services/fmp/company.js';
+import { searchCompanies, resolveTicker } from '../services/fmp/company.js';
 import companyTool from './tools/company.tool.js';
 import financialTool from './tools/financial.tool.js';
 import ratioTool from './tools/ratio.tool.js';
@@ -37,26 +37,14 @@ export const AgentState = Annotation.Root({
  */
 async function companyNode(state) {
   try {
-    let targetSymbol = state.companyQuery ? state.companyQuery.trim() : '';
-    let resolvedName = '';
+    const query = state.companyQuery ? state.companyQuery.trim() : '';
 
-    if (!targetSymbol) {
+    if (!query) {
       throw new Error('A company name or ticker symbol query is required to start the agent.');
     }
 
-    // If query is a name (longer than 5 letters, or search matches), resolve symbol
-    if (targetSymbol.length > 5 || !/^[A-Z0-9.\-]+$/i.test(targetSymbol)) {
-      const searchResults = await searchCompanies(targetSymbol, 1);
-      if (searchResults && searchResults.length > 0) {
-        targetSymbol = searchResults[0].symbol;
-        resolvedName = searchResults[0].name;
-      } else {
-        // Fallback: use query as symbol directly
-        targetSymbol = targetSymbol.toUpperCase();
-      }
-    } else {
-      targetSymbol = targetSymbol.toUpperCase();
-    }
+    // Call resolveTicker to dynamically resolve the ticker symbol
+    const targetSymbol = await resolveTicker(query);
 
     // Call the company tool
     const profileData = await companyTool.invoke({ symbol: targetSymbol });
@@ -74,7 +62,7 @@ async function companyNode(state) {
 
     return {
       symbol: targetSymbol,
-      companyName: profile.companyName || resolvedName || targetSymbol,
+      companyName: profile.companyName || targetSymbol,
       profile,
     };
   } catch (error) {
@@ -126,7 +114,8 @@ async function eventsNode(state) {
     const data = await eventsTool.invoke({ symbol: state.symbol });
     return { events: data };
   } catch (error) {
-    throw new Error(`[Node: Events] Failed: ${error.message}`);
+    console.error(`[Node: Events] Warning (skipping): ${error.message}`);
+    return { events: [] };
   }
 }
 
@@ -138,7 +127,8 @@ async function newsNode(state) {
     const data = await newsTool.invoke({ symbol: state.symbol });
     return { news: data };
   } catch (error) {
-    throw new Error(`[Node: News] Failed: ${error.message}`);
+    console.error(`[Node: News] Warning (skipping): ${error.message}`);
+    return { news: [] };
   }
 }
 
@@ -153,7 +143,8 @@ async function newsFilterNode(state) {
     });
     return { filteredNews: result.filteredNews };
   } catch (error) {
-    throw new Error(`[Node: News Filter] Failed: ${error.message}`);
+    console.error(`[Node: News Filter] Warning (skipping): ${error.message}`);
+    return { filteredNews: [] };
   }
 }
 

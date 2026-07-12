@@ -2,7 +2,7 @@ import fmpClient from '../../config/axios.config.js';
 
 export async function getEarningsCalendar(from, to) {
   try {
-    const response = await fmpClient.get('/earning_calendar', {
+    const response = await fmpClient.get('/earnings-calendar', {
       params: { from, to },
     });
     return response.data;
@@ -14,7 +14,7 @@ export async function getEarningsCalendar(from, to) {
 
 export async function getDividendCalendar(from, to) {
   try {
-    const response = await fmpClient.get('/stock_dividend_calendar', {
+    const response = await fmpClient.get('/dividends-calendar', {
       params: { from, to },
     });
     return response.data;
@@ -26,7 +26,7 @@ export async function getDividendCalendar(from, to) {
 
 export async function getIpoCalendar(from, to) {
   try {
-    const response = await fmpClient.get('/ipo_calendar', {
+    const response = await fmpClient.get('/ipos-calendar', {
       params: { from, to },
     });
     return response.data;
@@ -38,7 +38,7 @@ export async function getIpoCalendar(from, to) {
 
 export async function getSplitCalendar(from, to) {
   try {
-    const response = await fmpClient.get('/stock_split_calendar', {
+    const response = await fmpClient.get('/splits-calendar', {
       params: { from, to },
     });
     return response.data;

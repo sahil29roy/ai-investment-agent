@@ -7,6 +7,19 @@ import ai from '../../config/gemini.config.js';
 import { buildNewsFilterPrompt } from './prompts.js';
 import { parseNewsResponse } from './outputParser.js';
 
+function generateFallbackNews(newsArticles) {
+  const filtered = (newsArticles || []).slice(0, 3).map((art) => {
+    return {
+      title: art.title || 'Market Update',
+      summary: art.text || art.title || 'No summary available.',
+      sentiment: 'Neutral',
+      investmentImpact: 'Low',
+      reason: 'Automated fallback classification due to API quota limits.'
+    };
+  });
+  return { filteredNews: filtered };
+}
+
 /**
  * Filters news articles for a company to keep only investment-relevant ones.
  * 
@@ -45,7 +58,7 @@ export async function filterNews(companyName, newsArticles) {
     // Parse and validate the response against the schema
     return parseNewsResponse(response.text);
   } catch (error) {
-    // Re-throw with clear context, maintaining descriptive validation errors
-    throw new Error(`News filtering service failed: ${error.message}`);
+    console.warn(`[News Filter] Gemini API failed (${error.message}). Using fallback classification.`);
+    return generateFallbackNews(newsArticles);
   }
 }
