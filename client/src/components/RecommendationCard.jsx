@@ -1,13 +1,14 @@
 import React from 'react'
-import { Box, Flex, Text } from '@chakra-ui/react'
+import { Box, Flex, Text, Progress, Button } from '@chakra-ui/react'
+import { ShieldCheck, ArrowUpRight } from 'lucide-react'
 
 export function RecommendationCard({ recommendation }) {
   const defaultRec = {
     ticker: "AAPL",
     name: "Apple Inc.",
-    consensus: "STRONG BUY",
+    consensus: "Strong Buy",
     score: 8.4,
-    status: "INVEST", // 'INVEST' | 'PASS'
+    status: "INVEST",
     summary: "Solid cash flow generation, strong services growth, and stable margins justify an INVEST action. Despite macro headwinds, product demand remains robust, and valuation is attractive relative to historical averages.",
     analystsCount: 42,
     targetPrice: "$210.00",
@@ -16,180 +17,114 @@ export function RecommendationCard({ recommendation }) {
 
   const rec = recommendation || defaultRec
   const isInvest = rec.status === "INVEST"
-  const accentColor = isInvest ? "positive" : "negative"
-  const isUpsidePositive = rec.upside && !rec.upside.startsWith('-')
-  const upsideColor = isUpsidePositive ? "positive" : "negative"
+  const confidencePercent = rec.score * 10
 
   return (
     <Box
       bg="surface"
       border="1px solid"
       borderColor="border"
-      borderRadius="sm"
-      p="4"
+      borderRadius="xl"
+      p="6"
+      boxShadow="sm"
       width="100%"
+      display="flex"
+      flexDirection="column"
+      gap="4"
     >
-      {/* Top Header */}
-      <Flex justify="space-between" align="center" mb="3">
-        <Flex align="center" gap="2">
-          <Text
-            fontFamily="mono"
-            fontSize="16px"
-            fontWeight="bold"
-            color="text.primary"
-          >
-            {rec.ticker}
-          </Text>
-          <Text
-            fontSize="12px"
-            color="text.muted"
-            fontFamily="body"
-          >
-            {rec.name}
-          </Text>
-        </Flex>
-        {/* Recommendation Tag */}
-        <Box
+      {/* Reassuring badge header */}
+      <Flex justify="space-between" align="center">
+        <Text fontSize="13px" fontWeight="bold" color="text.muted" textTransform="uppercase" letterSpacing="0.05em">
+          Our Recommendation
+        </Text>
+        <Flex
+          bg={isInvest ? "rgba(15, 110, 86, 0.08)" : "gray.100"}
           border="1px solid"
-          borderColor={accentColor}
-          color={accentColor}
-          fontSize="11px"
+          borderColor={isInvest ? "brand" : "gray.300"}
+          color={isInvest ? "brand" : "gray.700"}
+          px="3"
+          py="1"
+          borderRadius="lg"
+          align="center"
+          gap="1.5"
           fontWeight="bold"
-          fontFamily="mono"
-          px="2"
-          py="0.5"
-          borderRadius="sm"
-          bg="transparent"
+          fontSize="14px"
         >
+          <ShieldCheck size={16} />
           {rec.status}
+        </Flex>
+      </Flex>
+
+      {/* Consensus & Confidence */}
+      <Box mt="2">
+        <Text fontSize="14px" fontWeight="medium" color="text.muted" mb="1.5">
+          Consensus: <Text as="span" fontWeight="bold" color={isInvest ? "brand" : "text.primary"}>{rec.consensus}</Text>
+        </Text>
+        
+        {/* Reassuring confidence horizontal bar instead of number */}
+        <Box mt="3" mb="1">
+          <Flex justify="space-between" align="center" mb="1.5">
+            <Text fontSize="13px" fontWeight="semibold" color="text.primary">
+              Analysis Confidence
+            </Text>
+            <Text fontSize="13px" fontWeight="medium" color="text.muted">
+              {isInvest ? "High" : "Moderate"}
+            </Text>
+          </Flex>
+          
+          <Progress.Root value={confidencePercent}>
+            <Progress.Track bg="gray.100" height="8px" borderRadius="full">
+              <Progress.Range bg="brand" borderRadius="full" />
+            </Progress.Track>
+          </Progress.Root>
+        </Box>
+      </Box>
+
+      {/* Target Price & Upside */}
+      <Flex justify="space-between" borderTop="1px solid" borderBottom="1px solid" borderColor="border" py="3" my="1">
+        <Box>
+          <Text fontSize="11px" fontWeight="bold" color="text.muted" textTransform="uppercase" letterSpacing="0.05em">
+            Target Price
+          </Text>
+          <Text fontSize="16px" fontWeight="bold" color="text.primary" mt="0.5">
+            {rec.targetPrice}
+          </Text>
+        </Box>
+        <Box textAlign="right">
+          <Text fontSize="11px" fontWeight="bold" color="text.muted" textTransform="uppercase" letterSpacing="0.05em">
+            Projected Upside
+          </Text>
+          <Flex align="center" gap="1" justify="flex-end" mt="0.5">
+            {isInvest && <ArrowUpRight size={14} />}
+            <Text fontSize="16px" fontWeight="bold" color={isInvest ? "brand" : "text.primary"}>
+              {rec.upside}
+            </Text>
+          </Flex>
         </Box>
       </Flex>
 
-      {/* Main recommendation readout */}
-      <Flex direction={{ base: "column", md: "row" }} gap="6" justify="space-between" mb="3">
-        {/* Score & Consensus */}
-        <Flex gap="6" align="center">
-          <Box>
-            <Text
-              fontSize="10px"
-              fontWeight="bold"
-              color="text.muted"
-              fontVariant="all-small-caps"
-              letterSpacing="0.08em"
-            >
-              System Score
-            </Text>
-            <Text
-              fontSize="28px"
-              fontWeight="extrabold"
-              fontFamily="mono"
-              color="text.primary"
-              lineHeight="1"
-              mt="1"
-            >
-              {rec.score}
-              <Text as="span" fontSize="14px" fontWeight="normal" color="text.muted" ml="1">
-                / 10
-              </Text>
-            </Text>
-          </Box>
-          <Box>
-            <Text
-              fontSize="10px"
-              fontWeight="bold"
-              color="text.muted"
-              fontVariant="all-small-caps"
-              letterSpacing="0.08em"
-            >
-              Consensus
-            </Text>
-            <Text
-              fontSize="14px"
-              fontWeight="bold"
-              fontFamily="mono"
-              color={accentColor}
-              mt="1.5"
-            >
-              {rec.consensus}
-            </Text>
-          </Box>
-        </Flex>
-
-        {/* Targets */}
-        <Flex gap="4" align="center">
-          <Box>
-            <Text
-              fontSize="10px"
-              fontWeight="bold"
-              color="text.muted"
-              fontVariant="all-small-caps"
-              letterSpacing="0.08em"
-            >
-              Target Price
-            </Text>
-            <Text
-              fontSize="14px"
-              fontFamily="mono"
-              fontWeight="semibold"
-              color="text.primary"
-              mt="1"
-            >
-              {rec.targetPrice}
-            </Text>
-          </Box>
-          <Box>
-            <Text
-              fontSize="10px"
-              fontWeight="bold"
-              color="text.muted"
-              fontVariant="all-small-caps"
-              letterSpacing="0.08em"
-            >
-              Projected Upside
-            </Text>
-            <Text
-              fontSize="14px"
-              fontFamily="mono"
-              fontWeight="semibold"
-              color={upsideColor}
-              mt="1"
-            >
-              {rec.upside}
-            </Text>
-          </Box>
-        </Flex>
-      </Flex>
-
-      {/* Separator / Divider */}
-      <Box height="1px" bg="border" my="3" />
-
-      {/* Summary Prose */}
+      {/* Reassuring explanation */}
       <Box>
-        <Text
-          fontSize="10px"
-          fontWeight="bold"
-          color="text.muted"
-          fontVariant="all-small-caps"
-          letterSpacing="0.08em"
-          mb="1"
-        >
-          Research Verdict
-        </Text>
-        <Text
-          fontSize="13px"
-          lineHeight="1.5"
-          color="text.primary"
-          fontFamily="body"
-        >
+        <Text fontSize="15px" lineHeight="1.6" color="text.primary">
           {rec.summary}
         </Text>
       </Box>
 
-      {/* System diagnostics footer */}
-      <Flex mt="3" justify="space-between" fontSize="10px" fontFamily="mono" color="text.muted">
-        <Text>ANALYSTS WATCHING: {rec.analystsCount}</Text>
-        <Text>STATUS: COMPILED OK</Text>
-      </Flex>
+      {/* CTA Button using primary color sparingly */}
+      <Button
+        bg="brand"
+        color="white"
+        _hover={{ bg: "#0c5a46" }}
+        borderRadius="lg"
+        height="44px"
+        width="100%"
+        fontWeight="bold"
+        fontSize="14px"
+        cursor="pointer"
+        mt="2"
+      >
+        Add to My Portfolio
+      </Button>
     </Box>
   )
 }

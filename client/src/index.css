@@ -1,7 +1,7 @@
 html,
 body {
-  background-color: #0D0F12 !important;
-  color: #E2E8F0 !important;
+  background-color: #FAFAF8 !important;
+  color: #1A202C !important;
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
@@ -11,24 +11,24 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #0D0F12;
+  background-color: #FAFAF8;
 }
 
-/* Custom terminal styling scrollbars */
+/* Custom warm scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0D0F12;
+  background: #FAFAF8;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #23272F;
-  border-radius: 3px;
+  background: #E2E8F0;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #8A909C;
+  background: #CBD5E0;
 }

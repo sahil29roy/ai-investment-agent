@@ -4,43 +4,43 @@ const config = defineConfig({
   theme: {
     tokens: {
       colors: {
-        bg: { value: "#0D0F12" },
-        surface: { value: "#16191D" },
-        positive: { value: "#00D084" },
-        negative: { value: "#FF4757" },
-        border: { value: "#23272F" },
+        brand: { value: "#0F6E56" },
+        bg: { value: "#FAFAF8" },
+        surface: { value: "#FFFFFF" },
+        border: { value: "#E2E8F0" },
         text: {
-          primary: { value: "#E2E8F0" },
-          muted: { value: "#8A909C" },
+          primary: { value: "#1A202C" },
+          muted: { value: "#718096" },
         },
+        positive: { value: "#0F6E56" },
+        negative: { value: "#E53E3E" },
       },
       fonts: {
         body: { value: "'Inter', sans-serif" },
         heading: { value: "'Inter', sans-serif" },
-        mono: { value: "'JetBrains Mono', 'IBM Plex Mono', monospace" },
       },
       radii: {
-        xs: { value: "1px" },
-        sm: { value: "2px" },
-        md: { value: "2px" },
-        lg: { value: "2px" },
+        sm: { value: "6px" },
+        md: { value: "8px" },
+        lg: { value: "12px" },
+        xl: { value: "16px" },
+      },
+      shadows: {
+        sm: { value: "0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)" },
+        md: { value: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)" },
       },
     },
   },
   globalCss: {
     "html, body": {
-      backgroundColor: "#0D0F12",
-      color: "#E2E8F0",
+      backgroundColor: "#FAFAF8",
+      color: "#1A202C",
       fontFamily: "'Inter', sans-serif",
-      fontSize: "13px",
-      lineHeight: "1.4",
+      fontSize: "15px",
+      lineHeight: "1.6",
       margin: 0,
       padding: 0,
-    },
-    // Grayscale focus rings, custom thin scrollbars, etc. for terminal aesthetic
-    ":focus-visible": {
-      outline: "1px solid #8A909C !important",
-      outlineOffset: "0px !important",
+      WebkitFontSmoothing: "antialiased",
     },
   },
 })

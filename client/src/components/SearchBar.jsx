@@ -2,7 +2,7 @@ import React from 'react'
 import { Input, Box, Flex } from '@chakra-ui/react'
 import { Search } from 'lucide-react'
 
-export function SearchBar({ value, onChange, placeholder = "SEARCH TICKER (e.g. AAPL, NVDA, TSLA)...", onSubmit }) {
+export function SearchBar({ value, onChange, placeholder = "Search for a company or ticker (e.g. AAPL, NVDA, TSLA)...", onSubmit }) {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && onSubmit) {
       onSubmit(value)
@@ -16,14 +16,15 @@ export function SearchBar({ value, onChange, placeholder = "SEARCH TICKER (e.g. 
         bg="surface"
         border="1px solid"
         borderColor="border"
-        borderRadius="sm"
-        px="3"
-        height="36px"
-        transition="border-color 0.2s ease"
-        _focusWithin={{ borderColor: "text.muted" }}
+        borderRadius="xl"
+        px="4"
+        height="48px"
+        boxShadow="sm"
+        transition="all 0.2s ease"
+        _focusWithin={{ borderColor: "brand", boxShadow: "md" }}
       >
-        <Box color="text.muted" mr="2" display="flex" alignItems="center">
-          <Search size={14} />
+        <Box color="brand" mr="3" display="flex" alignItems="center">
+          <Search size={18} />
         </Box>
         <Input
           value={value}
@@ -39,10 +40,10 @@ export function SearchBar({ value, onChange, placeholder = "SEARCH TICKER (e.g. 
           height="100%"
           width="100%"
           color="text.primary"
-          fontSize="13px"
-          fontFamily="mono"
+          fontSize="15px"
+          fontFamily="body"
           px="0"
-          _placeholder={{ color: "text.muted", opacity: 0.6, fontSize: "11px", fontFamily: "mono" }}
+          _placeholder={{ color: "text.muted", opacity: 0.6, fontSize: "14px", fontFamily: "body" }}
         />
       </Flex>
     </Box>
